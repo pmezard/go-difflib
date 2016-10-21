@@ -606,7 +606,7 @@ func WriteUnifiedDiff(writer io.Writer, diff UnifiedDiff) error {
 			i1, i2, j1, j2 := c.I1, c.I2, c.J1, c.J2
 			if c.Tag == 'e' {
 				for _, line := range diff.A[i1:i2] {
-					if err := ws(" " + line); err != nil {
+					if err := ws(" " + line + diff.Eol); err != nil {
 						return err
 					}
 				}
@@ -614,14 +614,14 @@ func WriteUnifiedDiff(writer io.Writer, diff UnifiedDiff) error {
 			}
 			if c.Tag == 'r' || c.Tag == 'd' {
 				for _, line := range diff.A[i1:i2] {
-					if err := ws("-" + line); err != nil {
+					if err := ws("-" + line + diff.Eol); err != nil {
 						return err
 					}
 				}
 			}
 			if c.Tag == 'r' || c.Tag == 'i' {
 				for _, line := range diff.B[j1:j2] {
-					if err := ws("+" + line); err != nil {
+					if err := ws("+" + line + diff.Eol); err != nil {
 						return err
 					}
 				}
@@ -730,7 +730,7 @@ func WriteContextDiff(writer io.Writer, diff ContextDiff) error {
 						continue
 					}
 					for _, line := range diff.A[cc.I1:cc.I2] {
-						ws(prefix[cc.Tag] + line)
+						ws(prefix[cc.Tag] + line + diff.Eol)
 					}
 				}
 				break
@@ -746,7 +746,7 @@ func WriteContextDiff(writer io.Writer, diff ContextDiff) error {
 						continue
 					}
 					for _, line := range diff.B[cc.J1:cc.J2] {
-						ws(prefix[cc.Tag] + line)
+						ws(prefix[cc.Tag] + line + diff.Eol)
 					}
 				}
 				break
@@ -763,10 +763,9 @@ func GetContextDiffString(diff ContextDiff) (string, error) {
 	return string(w.Bytes()), err
 }
 
-// Split a string on "\n" while preserving them. The output can be used
+// Split a string on "\n". The output can be used
 // as input for UnifiedDiff and ContextDiff structures.
 func SplitLines(s string) []string {
-	lines := strings.SplitAfter(s, "\n")
-	lines[len(lines)-1] += "\n"
+	lines := strings.Split(strings.TrimSpace(s), "\n")
 	return lines
 }
