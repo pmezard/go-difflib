@@ -161,12 +161,12 @@ func (m *SequenceMatcher) chainB() {
 	m.bJunk = map[string]struct{}{}
 	if m.IsJunk != nil {
 		junk := m.bJunk
-		for s, _ := range b2j {
+		for s := range b2j {
 			if m.IsJunk(s) {
 				junk[s] = struct{}{}
 			}
 		}
-		for s, _ := range junk {
+		for s := range junk {
 			delete(b2j, s)
 		}
 	}
@@ -181,7 +181,7 @@ func (m *SequenceMatcher) chainB() {
 				popular[s] = struct{}{}
 			}
 		}
-		for s, _ := range popular {
+		for s := range popular {
 			delete(b2j, s)
 		}
 	}
@@ -268,7 +268,7 @@ func (m *SequenceMatcher) findLongestMatch(alo, ahi, blo, bhi int) Match {
 	for besti+bestsize < ahi && bestj+bestsize < bhi &&
 		!m.isBJunk(m.b[bestj+bestsize]) &&
 		m.a[besti+bestsize] == m.b[bestj+bestsize] {
-		bestsize += 1
+		bestsize++
 	}
 
 	// Now that we have a wholly interesting match (albeit possibly
@@ -285,7 +285,7 @@ func (m *SequenceMatcher) findLongestMatch(alo, ahi, blo, bhi int) Match {
 	for besti+bestsize < ahi && bestj+bestsize < bhi &&
 		m.isBJunk(m.b[bestj+bestsize]) &&
 		m.a[besti+bestsize] == m.b[bestj+bestsize] {
-		bestsize += 1
+		bestsize++
 	}
 
 	return Match{A: besti, B: bestj, Size: bestsize}
@@ -496,7 +496,7 @@ func (m *SequenceMatcher) QuickRatio() float64 {
 		}
 		avail[s] = n - 1
 		if n > 0 {
-			matches += 1
+			matches++
 		}
 	}
 	return calculateRatio(matches, len(m.a)+len(m.b))
@@ -520,7 +520,7 @@ func formatRangeUnified(start, stop int) string {
 		return fmt.Sprintf("%d", beginning)
 	}
 	if length == 0 {
-		beginning -= 1 // empty ranges begin at line just before the range
+		beginning-- // empty ranges begin at line just before the range
 	}
 	return fmt.Sprintf("%d,%d", beginning, length)
 }
@@ -644,7 +644,7 @@ func formatRangeContext(start, stop int) string {
 	beginning := start + 1 // lines start numbering with one
 	length := stop - start
 	if length == 0 {
-		beginning -= 1 // empty ranges begin at line just before the range
+		beginning-- // empty ranges begin at line just before the range
 	}
 	if length <= 1 {
 		return fmt.Sprintf("%d", beginning)
