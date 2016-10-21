@@ -15,9 +15,12 @@ func assertAlmostEqual(t *testing.T, a, b float64, places int) {
 	}
 }
 
-func assertEqual(t *testing.T, a, b interface{}) {
-	if !reflect.DeepEqual(a, b) {
-		t.Errorf("%v != %v", a, b)
+func assertEqual(t *testing.T, got, want interface{}) {
+	if !reflect.DeepEqual(got, want) {
+		fmt.Println("got:")
+		fmt.Printf("%#v\n", got)
+		fmt.Println("want:")
+		fmt.Printf("%#v\n", want)
 	}
 }
 
@@ -102,7 +105,7 @@ group
 	}
 }
 
-func ExampleGetUnifiedDiffCode() {
+func ExampleGetUnifiedDiffString() {
 	a := `one
 two
 three
@@ -135,7 +138,7 @@ four`
 	// -fmt.Printf("%s,%T",a,b)
 }
 
-func ExampleGetContextDiffCode() {
+func ExampleGetContextDiffString() {
 	a := `one
 two
 three
@@ -165,41 +168,6 @@ four`
 	// ! three
 	//   four
 	// - fmt.Printf("%s,%T",a,b)
-	// --- 1,4 ----
-	// + zero
-	//   one
-	// ! tree
-	//   four
-}
-
-func ExampleGetContextDiffString() {
-	a := `one
-two
-three
-four`
-	b := `zero
-one
-tree
-four`
-	diff := ContextDiff{
-		A:        SplitLines(a),
-		B:        SplitLines(b),
-		FromFile: "Original",
-		ToFile:   "Current",
-		Context:  3,
-		Eol:      "\n",
-	}
-	result, _ := GetContextDiffString(diff)
-	fmt.Printf(strings.Replace(result, "\t", " ", -1))
-	// Output:
-	// *** Original
-	// --- Current
-	// ***************
-	// *** 1,4 ****
-	//   one
-	// ! two
-	// ! three
-	//   four
 	// --- 1,4 ----
 	// + zero
 	//   one
@@ -329,14 +297,14 @@ func TestOutputFormatTabDelimiter(t *testing.T) {
 	ud, err := GetUnifiedDiffString(diff)
 	assertEqual(t, err, nil)
 	assertEqual(t, SplitLines(ud)[:2], []string{
-		"--- Original\t2005-01-26 23:30:50\n",
-		"+++ Current\t2010-04-12 10:20:52\n",
+		"--- Original\t2005-01-26 23:30:50",
+		"+++ Current\t2010-04-12 10:20:52",
 	})
 	cd, err := GetContextDiffString(ContextDiff(diff))
 	assertEqual(t, err, nil)
 	assertEqual(t, SplitLines(cd)[:2], []string{
-		"*** Original\t2005-01-26 23:30:50\n",
-		"--- Current\t2010-04-12 10:20:52\n",
+		"*** Original\t2005-01-26 23:30:50",
+		"--- Current\t2010-04-12 10:20:52",
 	})
 }
 
@@ -350,11 +318,11 @@ func TestOutputFormatNoTrailingTabOnEmptyFiledate(t *testing.T) {
 	}
 	ud, err := GetUnifiedDiffString(diff)
 	assertEqual(t, err, nil)
-	assertEqual(t, SplitLines(ud)[:2], []string{"--- Original\n", "+++ Current\n"})
+	assertEqual(t, SplitLines(ud)[:2], []string{"--- Original", "+++ Current"})
 
 	cd, err := GetContextDiffString(ContextDiff(diff))
 	assertEqual(t, err, nil)
-	assertEqual(t, SplitLines(cd)[:2], []string{"*** Original\n", "--- Current\n"})
+	assertEqual(t, SplitLines(cd)[:2], []string{"*** Original", "--- Current"})
 }
 
 func TestOmitFilenames(t *testing.T) {
@@ -366,29 +334,27 @@ func TestOmitFilenames(t *testing.T) {
 	ud, err := GetUnifiedDiffString(diff)
 	assertEqual(t, err, nil)
 	assertEqual(t, SplitLines(ud), []string{
-		"@@ -0,0 +1,2 @@\n",
-		"+t\n",
-		"+w\n",
-		"@@ -2,2 +3,0 @@\n",
-		"-n\n",
-		"-e\n",
-		"\n",
+		"@@ -0,0 +1,2 @@",
+		"+t",
+		"+w",
+		"@@ -2,2 +3,0 @@",
+		"-n",
+		"-e",
 	})
 
 	cd, err := GetContextDiffString(ContextDiff(diff))
 	assertEqual(t, err, nil)
 	assertEqual(t, SplitLines(cd), []string{
-		"***************\n",
-		"*** 0 ****\n",
-		"--- 1,2 ----\n",
-		"+ t\n",
-		"+ w\n",
-		"***************\n",
-		"*** 2,3 ****\n",
-		"- n\n",
-		"- e\n",
-		"--- 3 ----\n",
-		"\n",
+		"***************",
+		"*** 0 ****",
+		"--- 1,2 ----",
+		"+ t",
+		"+ w",
+		"***************",
+		"*** 2,3 ****",
+		"- n",
+		"- e",
+		"--- 3 ----",
 	})
 }
 
@@ -397,9 +363,9 @@ func TestSplitLines(t *testing.T) {
 		input string
 		want  []string
 	}{
-		{"foo", []string{"foo\n"}},
-		{"foo\nbar", []string{"foo\n", "bar\n"}},
-		{"foo\nbar\n", []string{"foo\n", "bar\n", "\n"}},
+		{"foo", []string{"foo"}},
+		{"foo\nbar", []string{"foo", "bar"}},
+		{"foo\nbar\n", []string{"foo", "bar"}},
 	}
 	for _, test := range allTests {
 		assertEqual(t, SplitLines(test.input), test.want)

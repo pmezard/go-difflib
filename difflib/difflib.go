@@ -161,12 +161,12 @@ func (m *SequenceMatcher) chainB() {
 	m.bJunk = map[string]struct{}{}
 	if m.IsJunk != nil {
 		junk := m.bJunk
-		for s, _ := range b2j {
+		for s := range b2j {
 			if m.IsJunk(s) {
 				junk[s] = struct{}{}
 			}
 		}
-		for s, _ := range junk {
+		for s := range junk {
 			delete(b2j, s)
 		}
 	}
@@ -181,7 +181,7 @@ func (m *SequenceMatcher) chainB() {
 				popular[s] = struct{}{}
 			}
 		}
-		for s, _ := range popular {
+		for s := range popular {
 			delete(b2j, s)
 		}
 	}
@@ -268,7 +268,7 @@ func (m *SequenceMatcher) findLongestMatch(alo, ahi, blo, bhi int) Match {
 	for besti+bestsize < ahi && bestj+bestsize < bhi &&
 		!m.isBJunk(m.b[bestj+bestsize]) &&
 		m.a[besti+bestsize] == m.b[bestj+bestsize] {
-		bestsize += 1
+		bestsize++
 	}
 
 	// Now that we have a wholly interesting match (albeit possibly
@@ -285,7 +285,7 @@ func (m *SequenceMatcher) findLongestMatch(alo, ahi, blo, bhi int) Match {
 	for besti+bestsize < ahi && bestj+bestsize < bhi &&
 		m.isBJunk(m.b[bestj+bestsize]) &&
 		m.a[besti+bestsize] == m.b[bestj+bestsize] {
-		bestsize += 1
+		bestsize++
 	}
 
 	return Match{A: besti, B: bestj, Size: bestsize}
@@ -496,7 +496,7 @@ func (m *SequenceMatcher) QuickRatio() float64 {
 		}
 		avail[s] = n - 1
 		if n > 0 {
-			matches += 1
+			matches++
 		}
 	}
 	return calculateRatio(matches, len(m.a)+len(m.b))
@@ -520,7 +520,7 @@ func formatRangeUnified(start, stop int) string {
 		return fmt.Sprintf("%d", beginning)
 	}
 	if length == 0 {
-		beginning -= 1 // empty ranges begin at line just before the range
+		beginning-- // empty ranges begin at line just before the range
 	}
 	return fmt.Sprintf("%d,%d", beginning, length)
 }
@@ -606,7 +606,7 @@ func WriteUnifiedDiff(writer io.Writer, diff UnifiedDiff) error {
 			i1, i2, j1, j2 := c.I1, c.I2, c.J1, c.J2
 			if c.Tag == 'e' {
 				for _, line := range diff.A[i1:i2] {
-					if err := ws(" " + line); err != nil {
+					if err := ws(" " + line + diff.Eol); err != nil {
 						return err
 					}
 				}
@@ -614,14 +614,14 @@ func WriteUnifiedDiff(writer io.Writer, diff UnifiedDiff) error {
 			}
 			if c.Tag == 'r' || c.Tag == 'd' {
 				for _, line := range diff.A[i1:i2] {
-					if err := ws("-" + line); err != nil {
+					if err := ws("-" + line + diff.Eol); err != nil {
 						return err
 					}
 				}
 			}
 			if c.Tag == 'r' || c.Tag == 'i' {
 				for _, line := range diff.B[j1:j2] {
-					if err := ws("+" + line); err != nil {
+					if err := ws("+" + line + diff.Eol); err != nil {
 						return err
 					}
 				}
@@ -644,7 +644,7 @@ func formatRangeContext(start, stop int) string {
 	beginning := start + 1 // lines start numbering with one
 	length := stop - start
 	if length == 0 {
-		beginning -= 1 // empty ranges begin at line just before the range
+		beginning-- // empty ranges begin at line just before the range
 	}
 	if length <= 1 {
 		return fmt.Sprintf("%d", beginning)
@@ -730,7 +730,7 @@ func WriteContextDiff(writer io.Writer, diff ContextDiff) error {
 						continue
 					}
 					for _, line := range diff.A[cc.I1:cc.I2] {
-						ws(prefix[cc.Tag] + line)
+						ws(prefix[cc.Tag] + line + diff.Eol)
 					}
 				}
 				break
@@ -746,7 +746,7 @@ func WriteContextDiff(writer io.Writer, diff ContextDiff) error {
 						continue
 					}
 					for _, line := range diff.B[cc.J1:cc.J2] {
-						ws(prefix[cc.Tag] + line)
+						ws(prefix[cc.Tag] + line + diff.Eol)
 					}
 				}
 				break
@@ -763,10 +763,9 @@ func GetContextDiffString(diff ContextDiff) (string, error) {
 	return string(w.Bytes()), err
 }
 
-// Split a string on "\n" while preserving them. The output can be used
+// Split a string on "\n". The output can be used
 // as input for UnifiedDiff and ContextDiff structures.
 func SplitLines(s string) []string {
-	lines := strings.SplitAfter(s, "\n")
-	lines[len(lines)-1] += "\n"
+	lines := strings.Split(strings.TrimSpace(s), "\n")
 	return lines
 }
