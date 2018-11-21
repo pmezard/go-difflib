@@ -535,6 +535,7 @@ type UnifiedDiff struct {
 	ToDate   string   // Second file time
 	Eol      string   // Headers end of line, defaults to LF
 	Context  int      // Number of context lines
+	Colored  bool     // Whether or not to use ANSI color in output
 }
 
 // Compare two sequences of lines; generate the delta as a unified diff.
@@ -570,6 +571,14 @@ func WriteUnifiedDiff(writer io.Writer, diff UnifiedDiff) error {
 
 	if len(diff.Eol) == 0 {
 		diff.Eol = "\n"
+	}
+
+	removeFormat := "-%s"
+	addFormat := "+%s"
+
+	if diff.Colored {
+		removeFormat = "\x1b[31m-%s\x1b[0m"
+		addFormat = "\x1b[32m+%s\x1b[0m"
 	}
 
 	started := false
@@ -614,14 +623,14 @@ func WriteUnifiedDiff(writer io.Writer, diff UnifiedDiff) error {
 			}
 			if c.Tag == 'r' || c.Tag == 'd' {
 				for _, line := range diff.A[i1:i2] {
-					if err := ws("-" + line); err != nil {
+					if err := ws(fmt.Sprintf(removeFormat, line)); err != nil {
 						return err
 					}
 				}
 			}
 			if c.Tag == 'r' || c.Tag == 'i' {
 				for _, line := range diff.B[j1:j2] {
-					if err := ws("+" + line); err != nil {
+					if err := ws(fmt.Sprintf(addFormat, line)); err != nil {
 						return err
 					}
 				}
