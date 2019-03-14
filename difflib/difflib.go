@@ -291,7 +291,7 @@ func (m *SequenceMatcher) findLongestMatch(alo, ahi, blo, bhi int) Match {
 	return Match{A: besti, B: bestj, Size: bestsize}
 }
 
-// Return list of triples describing matching subsequences.
+// GetMatchingBlocks returns list of triples describing matching subsequences.
 //
 // Each triple is of the form (i, j, n), and means that
 // a[i:i+n] == b[j:j+n].  The triples are monotonically increasing in
@@ -355,7 +355,7 @@ func (m *SequenceMatcher) GetMatchingBlocks() []Match {
 	return m.matchingBlocks
 }
 
-// Return list of 5-tuples describing how to turn a into b.
+// GetOpCodes returns list of 5-tuples describing how to turn a into b.
 //
 // Each tuple is of the form (tag, i1, i2, j1, j2).  The first tuple
 // has i1 == j1 == 0, and remaining tuples have i1 == the i2 from the
@@ -406,7 +406,7 @@ func (m *SequenceMatcher) GetOpCodes() []OpCode {
 	return m.opCodes
 }
 
-// Isolate change clusters by eliminating ranges with no changes.
+// GetGroupedOpCodes Isolate change clusters by eliminating ranges with no changes.
 //
 // Return a generator of groups with up to n lines of context.
 // Each group is in the same format as returned by GetOpCodes().
@@ -451,7 +451,7 @@ func (m *SequenceMatcher) GetGroupedOpCodes(n int) [][]OpCode {
 	return groups
 }
 
-// Return a measure of the sequences' similarity (float in [0,1]).
+// Ratio returns a measure of the sequences' similarity (float in [0,1]).
 //
 // Where T is the total number of elements in both sequences, and
 // M is the number of matches, this is 2.0*M / T.
@@ -470,7 +470,7 @@ func (m *SequenceMatcher) Ratio() float64 {
 	return calculateRatio(matches, len(m.a)+len(m.b))
 }
 
-// Return an upper bound on ratio() relatively quickly.
+// QuickRatio returns an upper bound on ratio() relatively quickly.
 //
 // This isn't defined beyond that it is an upper bound on .Ratio(), and
 // is faster to compute.
@@ -502,7 +502,7 @@ func (m *SequenceMatcher) QuickRatio() float64 {
 	return calculateRatio(matches, len(m.a)+len(m.b))
 }
 
-// Return an upper bound on ratio() very quickly.
+// RealQuickRatio returns an upper bound on ratio() very quickly.
 //
 // This isn't defined beyond that it is an upper bound on .Ratio(), and
 // is faster to compute than either .Ratio() or .QuickRatio().
@@ -537,7 +537,7 @@ type UnifiedDiff struct {
 	Context  int      // Number of context lines
 }
 
-// Compare two sequences of lines; generate the delta as a unified diff.
+// WriteUnifiedDiff compares two sequences of lines; generate the delta as a unified diff.
 //
 // Unified diffs are a compact way of showing line changes and a few
 // lines of context.  The number of context lines is set by 'n' which
@@ -654,7 +654,7 @@ func formatRangeContext(start, stop int) string {
 
 type ContextDiff UnifiedDiff
 
-// Compare two sequences of lines; generate the delta as a context diff.
+// WriteContextDiff compares two sequences of lines; generate the delta as a context diff.
 //
 // Context diffs are a compact way of showing line changes and a few
 // lines of context. The number of context lines is set by diff.Context
@@ -763,7 +763,7 @@ func GetContextDiffString(diff ContextDiff) (string, error) {
 	return string(w.Bytes()), err
 }
 
-// Split a string on "\n" while preserving them. The output can be used
+// SplitLines splits a string on "\n" while preserving them. The output can be used
 // as input for UnifiedDiff and ContextDiff structures.
 func SplitLines(s string) []string {
 	lines := strings.SplitAfter(s, "\n")
