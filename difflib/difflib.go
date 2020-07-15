@@ -586,11 +586,11 @@ func WriteUnifiedDiff(writer io.Writer, diff UnifiedDiff) error {
 				toDate = "\t" + diff.ToDate
 			}
 			if diff.FromFile != "" || diff.ToFile != "" {
-				err := wf("--- %s%s%s", diff.FromFile, fromDate, diff.Eol)
+				err := wf("\033[1;31m---\033[0m %s%s%s", diff.FromFile, fromDate, diff.Eol)
 				if err != nil {
 					return err
 				}
-				err = wf("+++ %s%s%s", diff.ToFile, toDate, diff.Eol)
+				err = wf("\033[1;32m+++\033[0m %s%s%s", diff.ToFile, toDate, diff.Eol)
 				if err != nil {
 					return err
 				}
@@ -599,7 +599,7 @@ func WriteUnifiedDiff(writer io.Writer, diff UnifiedDiff) error {
 		first, last := g[0], g[len(g)-1]
 		range1 := formatRangeUnified(first.I1, last.I2)
 		range2 := formatRangeUnified(first.J1, last.J2)
-		if err := wf("@@ -%s +%s @@%s", range1, range2, diff.Eol); err != nil {
+		if err := wf("\033[1;33m@@ -%s +%s @@%s\033[0m", range1, range2, diff.Eol); err != nil {
 			return err
 		}
 		for _, c := range g {
@@ -614,14 +614,14 @@ func WriteUnifiedDiff(writer io.Writer, diff UnifiedDiff) error {
 			}
 			if c.Tag == 'r' || c.Tag == 'd' {
 				for _, line := range diff.A[i1:i2] {
-					if err := ws("-" + line); err != nil {
+					if err := ws("\033[1;31m-\033[0m" + line); err != nil {
 						return err
 					}
 				}
 			}
 			if c.Tag == 'r' || c.Tag == 'i' {
 				for _, line := range diff.B[j1:j2] {
-					if err := ws("+" + line); err != nil {
+					if err := ws("\033[1;32m+\033[0m" + line); err != nil {
 						return err
 					}
 				}
