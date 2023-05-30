@@ -635,7 +635,7 @@ func WriteUnifiedDiff(writer io.Writer, diff UnifiedDiff) error {
 func GetUnifiedDiffString(diff UnifiedDiff) (string, error) {
 	w := &bytes.Buffer{}
 	err := WriteUnifiedDiff(w, diff)
-	return string(w.Bytes()), err
+	return w.String(), err
 }
 
 // Convert range to the "ed" format.
@@ -760,7 +760,7 @@ func WriteContextDiff(writer io.Writer, diff ContextDiff) error {
 func GetContextDiffString(diff ContextDiff) (string, error) {
 	w := &bytes.Buffer{}
 	err := WriteContextDiff(w, diff)
-	return string(w.Bytes()), err
+	return w.String(), err
 }
 
 // Split a string on "\n" while preserving them. The output can be used
