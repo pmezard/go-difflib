@@ -11,7 +11,7 @@
 // - context_diff
 //
 // Getting unified diffs was the main goal of the port. Keep in mind this code
-// is mostly suitable to output text differences in a human friendly way, there
+// is mostly suitable to output text differences in a human-friendly way, there
 // are no guarantees generated diffs are consumable by patch(1).
 package difflib
 
