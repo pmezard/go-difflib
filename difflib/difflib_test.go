@@ -102,7 +102,7 @@ group
 	}
 }
 
-func ExampleGetUnifiedDiffCode() {
+func ExampleGetUnifiedDiffString() {
 	a := `one
 two
 three
@@ -135,7 +135,7 @@ four`
 	// -fmt.Printf("%s,%T",a,b)
 }
 
-func ExampleGetContextDiffCode() {
+func ExampleGetContextDiffString_format() {
 	a := `one
 two
 three
@@ -190,7 +190,7 @@ four`
 		Eol:      "\n",
 	}
 	result, _ := GetContextDiffString(diff)
-	fmt.Printf(strings.Replace(result, "\t", " ", -1))
+	fmt.Print(strings.Replace(result, "\t", " ", -1))
 	// Output:
 	// *** Original
 	// --- Current
